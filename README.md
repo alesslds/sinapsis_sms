@@ -23,7 +23,7 @@ Este proyecto es una API Serverless basada en AWS Lambda para gestionar mensajes
 
 1. Clona el repositorio:
    ```bash
-   git clone <https://github.com/alesslds/sinapsis_sms.git>
+   git clone https://github.com/alesslds/sinapsis_sms.git
    cd sinapsis-sms
    ```
 
@@ -40,6 +40,18 @@ Este proyecto es una API Serverless basada en AWS Lambda para gestionar mensajes
    DB_PASSWORD=root
    DB_NAME=sinapsis_db
    ```
+
+---
+
+## Documentación y Base de Datos
+
+### Especificación OpenAPI
+En la carpeta `docs` se encuentra el archivo `openapi.yaml`, que puede ser visualizado utilizando Swagger. Puedes usar la herramienta en línea [Swagger Editor](https://editor.swagger.io/) para cargar y visualizar el archivo.
+
+### Script de Base de Datos
+En la misma carpeta `docs`, se encuentra el archivo `mysql_req_1.sql`, que contiene el script necesario para crear la base de datos requerida por la aplicación.
+
+---
 
 ## Uso
 
@@ -99,4 +111,6 @@ Usa el flag `--legacy-peer-deps` o `--force` al instalar dependencias.
 - **Autor:** Joel Litano
 - **Email:** joel.litanoliza@gmail.com
 - **Repositorio:** [https://github.com/alesslds/sinapsis_sms.git](#)
+
+
 
