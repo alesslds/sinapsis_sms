@@ -69,6 +69,14 @@ Para desplegar el proyecto en AWS:
 serverless deploy
 ```
 
+### Ejemplo de endpoint con actual version desplegada
+
+Reporte de mensajes para Febrero 2024:
+```
+https://xnbashnubf.execute-api.us-east-1.amazonaws.com/dev/reportes/mensajes?mes=2&anio=2024
+```
+
+
 ### Endpoints disponibles
 
 - **GET /reportes/mensajes**: Lista los mensajes activos.
