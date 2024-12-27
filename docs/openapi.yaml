@@ -158,12 +158,14 @@ components:
         - nombre
         - fechaHoraProgramacion
       example:
-        idUsuario: 101
+        idUsuario: 1
         nombre: "Campaña de primavera"
         fechaHoraProgramacion: "2024-05-10T10:00:00Z"
         mensajes:
           - mensaje: "¡No te pierdas las ofertas de primavera!"
-            estadoEnvio: 1
+            estadoEnvio: 2
+          - mensaje: "Segundo mensaje!"
+            estadoEnvio: 2
 
     CampaniaRespuesta:
       type: object
