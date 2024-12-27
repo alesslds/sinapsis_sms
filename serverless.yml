@@ -1,0 +1,40 @@
+service: sinapsis-sms
+frameworkVersion: '4'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'} # Stage dinámico: por defecto 'dev'
+  environment:
+    DB_HOST: ${env:DB_HOST}
+    DB_USER: ${env:DB_USER}
+    DB_PASSWORD: ${env:DB_PASSWORD}
+    DB_NAME: ${env:DB_NAME}
+
+
+functions:
+  listarMensajesActivos:
+    handler: src/handler.listarMensajesActivos
+    events:
+      - http:
+          path: reportes/mensajes
+          method: get
+          cors: true
+          
+  # Nuevo: crearCampania
+  crearCampania:
+    handler: src/handler.crearCampania
+    events:
+      - http:
+          path: campanias
+          method: post
+          cors: true
+
+custom:
+  dotenv:
+    path: .env.${self:provider.stage} # Archivo .env para cada stage
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-offline

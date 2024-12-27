@@ -1,0 +1,212 @@
+openapi: 3.0.3
+info:
+  title: Sinapsis Reports API
+  version: 1.0.0
+  description: >
+    API de Sinapsis para administrar campañas de marketing y generar reportes
+    sobre envío de mensajes.
+servers:
+  - url: 'https://xnbashnubf.execute-api.us-east-1.amazonaws.com/dev'
+    description: Servidor de producción
+  - url: 'http://localhost:3000/dev'
+    description: Servidor local con serverless-offline
+
+paths:
+  /campanias:
+    post:
+      summary: Programar una nueva campaña
+      description: >
+        Crea una nueva campaña, asociada a un usuario/cliente, con fecha y hora de
+        programación. Por defecto, la campaña inicia activa (`estado = 1`).
+      operationId: programarCampania
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CampaniaCreacion'
+      responses:
+        '201':
+          description: Campaña creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaniaRespuesta'
+        '400':
+          description: Error de validación (datos incorrectos o faltantes)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /reportes/mensajes:
+    get:
+      summary: Obtener reporte de mensajes activos
+      description: >
+        Retorna la cantidad de mensajes activos programados, clasificados por
+        estado de envío, filtrando de forma **obligatoria** por mes y año, y de
+        manera **opcional** por cliente.
+      operationId: obtenerReporteMensajes
+      parameters:
+        - name: mes
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+          description: Mes (1-12)
+        - name: anio
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 2000
+            maximum: 2100
+          description: Año para filtrar
+        - name: idCliente
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: ID del cliente (opcional)
+      responses:
+        '200':
+          description: Respuesta exitosa
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReporteMensajes'
+        '400':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Error interno del servidor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ReporteMensajes:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              estadoEnvio:
+                type: integer
+                description: 1 = Pendiente, 2 = Enviado, 3 = Error
+              totalMensajes:
+                type: integer
+                description: Total de mensajes en ese estado
+        metadata:
+          type: object
+          properties:
+            mes:
+              type: integer
+            anio:
+              type: integer
+            idCliente:
+              type: integer
+              nullable: true
+            totalRegistros:
+              type: integer
+      required:
+        - data
+        - metadata
+
+    CampaniaCreacion:
+      type: object
+      properties:
+        idUsuario:
+          type: integer
+          description: ID del usuario que crea la campaña (opcional si se infiere de un token)
+        nombre:
+          type: string
+          maxLength: 200
+          description: Nombre o título de la campaña
+        fechaHoraProgramacion:
+          type: string
+          format: date-time
+          description: Fecha y hora en la que se programará la campaña (UTC o con zona horaria definida)
+        mensajes:
+          type: array
+          description: (Opcional) Lista inicial de mensajes que se quieran programar
+          items:
+            type: object
+            properties:
+              mensaje:
+                type: string
+                description: Contenido del SMS (máx. 160 caracteres)
+              estadoEnvio:
+                type: integer
+                description: 1 = Pendiente, 2 = Enviado, 3 = Error (generalmente 1 = Pendiente para nuevos)
+      required:
+        - nombre
+        - fechaHoraProgramacion
+      example:
+        idUsuario: 101
+        nombre: "Campaña de primavera"
+        fechaHoraProgramacion: "2024-05-10T10:00:00Z"
+        mensajes:
+          - mensaje: "¡No te pierdas las ofertas de primavera!"
+            estadoEnvio: 1
+
+    CampaniaRespuesta:
+      type: object
+      properties:
+        idCampania:
+          type: integer
+          description: Identificador único de la campaña
+        nombre:
+          type: string
+        fechaHoraProgramacion:
+          type: string
+          format: date-time
+        estado:
+          type: integer
+          description: 1 = Activa, 0 = Inactiva
+        mensajesCreados:
+          type: array
+          items:
+            type: object
+            properties:
+              idMensaje:
+                type: integer
+              mensaje:
+                type: string
+              estadoEnvio:
+                type: integer
+      example:
+        idCampania: 5001
+        nombre: "Campaña de primavera"
+        fechaHoraProgramacion: "2024-05-10T10:00:00Z"
+        estado: 1
+        mensajesCreados:
+          - idMensaje: 900
+            mensaje: "¡No te pierdas las ofertas de primavera!"
+            estadoEnvio: 1
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        code:
+          type: string
+      required:
+        - message
+        - code
